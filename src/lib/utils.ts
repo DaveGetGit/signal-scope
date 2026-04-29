@@ -1,6 +1,14 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
+// Number formatting constants
+const CURRENCY_MIN_DECIMALS = 2;
+const CURRENCY_MAX_DECIMALS = 6;
+const DEFAULT_NUMBER_DECIMALS = 2;
+const PERCENTAGE_DECIMALS = 2;
+const COMPACT_MAX_DECIMALS = 2;
+const PERCENTAGE_DENOMINATOR = 100;
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -9,12 +17,15 @@ export function formatCurrency(value: number): string {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 6,
+    minimumFractionDigits: CURRENCY_MIN_DECIMALS,
+    maximumFractionDigits: CURRENCY_MAX_DECIMALS,
   }).format(value);
 }
 
-export function formatNumber(value: number, decimals: number = 2): string {
+export function formatNumber(
+  value: number,
+  decimals: number = DEFAULT_NUMBER_DECIMALS,
+): string {
   return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
@@ -24,9 +35,9 @@ export function formatNumber(value: number, decimals: number = 2): string {
 export function formatPercentage(value: number): string {
   const formatted = new Intl.NumberFormat("en-US", {
     style: "percent",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value / 100);
+    minimumFractionDigits: PERCENTAGE_DECIMALS,
+    maximumFractionDigits: PERCENTAGE_DECIMALS,
+  }).format(value / PERCENTAGE_DENOMINATOR);
 
   return value >= 0 ? `+${formatted}` : formatted;
 }
@@ -36,7 +47,7 @@ export function formatCompactNumber(value: number): string {
     notation: "compact",
     compactDisplay: "short",
     minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
+    maximumFractionDigits: COMPACT_MAX_DECIMALS,
   }).format(value);
 }
 

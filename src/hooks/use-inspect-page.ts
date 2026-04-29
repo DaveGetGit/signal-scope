@@ -9,6 +9,11 @@ import { SignalType } from "@/features/signals/api/types";
 import type { DateRange } from "@/components/charts/date-range-picker";
 import { PERF_PROFILES } from "@/lib/chart-perf-data";
 
+// Default time range constants
+const DEFAULT_TIME_RANGE_DAYS = 30;
+const DAYS_TO_MILLISECONDS = 24 * 60 * 60 * 1000;
+const DEFAULT_TIME_RANGE_MS = DEFAULT_TIME_RANGE_DAYS * DAYS_TO_MILLISECONDS;
+
 const LAST_INSTRUMENTS_URL_KEY = "signal-scope:last-instruments-url";
 
 interface InspectPageLocationState {
@@ -22,7 +27,9 @@ export function useInspectPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [defaultTo] = useState(() => Date.now());
   const locationState = location.state as InspectPageLocationState | null;
-  const persistedReturnTo = window.sessionStorage.getItem(LAST_INSTRUMENTS_URL_KEY);
+  const persistedReturnTo = window.sessionStorage.getItem(
+    LAST_INSTRUMENTS_URL_KEY,
+  );
   const backHref = locationState?.returnTo || persistedReturnTo || "/";
   const perfProfile = useMemo(() => {
     const perfParam = searchParams.get("perf");
@@ -49,7 +56,7 @@ export function useInspectPage() {
 
     if (!from || !to || isNaN(from) || isNaN(to)) {
       return {
-        from: defaultTo - 30 * 24 * 60 * 60 * 1000,
+        from: defaultTo - DEFAULT_TIME_RANGE_MS,
         to: defaultTo,
       };
     }

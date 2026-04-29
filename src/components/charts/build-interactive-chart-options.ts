@@ -3,6 +3,43 @@ import { SignalFormat, type Signal } from "@/features/signals/api/types";
 import type { ChartAnnotation } from "@/types/annotations";
 import { echartsTheme, withAlpha } from "@/lib/theme";
 
+// Chart configuration constants grouped by purpose
+const CHART_STYLE = {
+  titleFontSize: 16,
+  axisLabelFontSize: 12,
+  responsiveTitleFontSize: 14,
+  lineWidth: 2,
+  borderWidth: 2,
+  borderRadius: 4,
+  labelDistance: 6,
+  labelPadding: [4, 8],
+} as const;
+
+const CHART_LAYOUT = {
+  gridPadding: "50px",
+  gridTop: "60px",
+  gridResponsivePadding: "30px",
+  dataZoomBottomOffset: 10,
+  dataZoomHeight: 20,
+} as const;
+
+const CHART_PERFORMANCE = {
+  progressiveRenderThreshold: 4_000,
+  progressiveThreshold: 8_000,
+  animationDurationMs: 300,
+} as const;
+
+const CHART_ALPHA = {
+  areaFillStart: 0.12,
+  areaFillEnd: 0.03,
+  annotationFill: 0.25,
+  brushOutOfBounds: 0.1,
+} as const;
+
+const CHART_BREAKPOINTS = {
+  mobile: 768,
+} as const;
+
 interface BuildInteractiveChartOptionsArgs {
   annotations: ChartAnnotation[];
   currentSignal: Signal;
@@ -36,7 +73,7 @@ export function buildInteractiveChartOptions({
       text: `${symbol} - ${currentSignal.name}`,
       left: "center",
       textStyle: {
-        fontSize: 16,
+        fontSize: CHART_STYLE.titleFontSize,
         fontWeight: "600",
         color: echartsTheme.titleColor,
       },
@@ -69,10 +106,10 @@ export function buildInteractiveChartOptions({
       },
     },
     grid: {
-      left: "50px",
-      right: "50px",
-      top: "60px",
-      bottom: "50px",
+      left: CHART_LAYOUT.gridPadding,
+      right: CHART_LAYOUT.gridPadding,
+      top: CHART_LAYOUT.gridTop,
+      bottom: CHART_LAYOUT.gridPadding,
       containLabel: true,
     },
     xAxis: {
@@ -82,7 +119,7 @@ export function buildInteractiveChartOptions({
       },
       axisLabel: {
         color: echartsTheme.axisLabelColor,
-        fontSize: 12,
+        fontSize: CHART_STYLE.axisLabelFontSize,
       },
       splitLine: {
         show: true,
@@ -100,7 +137,7 @@ export function buildInteractiveChartOptions({
       },
       axisLabel: {
         color: echartsTheme.axisLabelColor,
-        fontSize: 12,
+        fontSize: CHART_STYLE.axisLabelFontSize,
         formatter: (value: number) => {
           return currentSignal.format === SignalFormat.Currency
             ? `$${value.toLocaleString()}`
@@ -121,7 +158,7 @@ export function buildInteractiveChartOptions({
         data: seriesData,
         lineStyle: {
           color: currentSignal.color,
-          width: 2,
+          width: CHART_STYLE.lineWidth,
         },
         itemStyle: {
           color: currentSignal.color,
@@ -134,8 +171,17 @@ export function buildInteractiveChartOptions({
             x2: 0,
             y2: 1,
             colorStops: [
-              { offset: 0, color: withAlpha(currentSignal.color, 0.12) },
-              { offset: 1, color: withAlpha(currentSignal.color, 0.03) },
+              {
+                offset: 0,
+                color: withAlpha(
+                  currentSignal.color,
+                  CHART_ALPHA.areaFillStart,
+                ),
+              },
+              {
+                offset: 1,
+                color: withAlpha(currentSignal.color, CHART_ALPHA.areaFillEnd),
+              },
             ],
           },
         },
@@ -144,8 +190,8 @@ export function buildInteractiveChartOptions({
         sampling: "lttb",
         large: isLargeSeries,
         largeThreshold: maxRenderPoints,
-        progressive: 4_000,
-        progressiveThreshold: 8_000,
+        progressive: CHART_PERFORMANCE.progressiveRenderThreshold,
+        progressiveThreshold: CHART_PERFORMANCE.progressiveThreshold,
         emphasis: {
           focus: "series",
         },
@@ -157,9 +203,9 @@ export function buildInteractiveChartOptions({
               xAxis: annotation.selection.start.x,
               yAxis: annotation.selection.start.y,
               itemStyle: {
-                color: withAlpha(annotation.color, 0.25),
+                color: withAlpha(annotation.color, CHART_ALPHA.annotationFill),
                 borderColor: annotation.color,
-                borderWidth: 2,
+                borderWidth: CHART_STYLE.borderWidth,
               },
               label: {
                 show: true,
@@ -170,9 +216,9 @@ export function buildInteractiveChartOptions({
                 backgroundColor: echartsTheme.annotationLabelBackground,
                 borderColor: echartsTheme.annotationLabelBorderColor,
                 borderWidth: 1,
-                padding: [4, 8],
-                borderRadius: 4,
-                distance: 6,
+                padding: CHART_STYLE.labelPadding,
+                borderRadius: CHART_STYLE.borderRadius,
+                distance: CHART_STYLE.labelDistance,
               },
             },
             {
@@ -191,10 +237,10 @@ export function buildInteractiveChartOptions({
             yAxisIndex: 0,
             brushLink: "all",
             outOfBrush: {
-              colorAlpha: 0.1,
+              colorAlpha: CHART_ALPHA.brushOutOfBounds,
             },
             brushStyle: {
-              borderWidth: 2,
+              borderWidth: CHART_STYLE.borderWidth,
               color: echartsTheme.brushFillColor,
               borderColor: echartsTheme.brushBorderColor,
             },
@@ -217,27 +263,29 @@ export function buildInteractiveChartOptions({
       {
         type: "slider",
         xAxisIndex: 0,
-        bottom: 10,
-        height: 20,
+        bottom: CHART_LAYOUT.dataZoomBottomOffset,
+        height: CHART_LAYOUT.dataZoomHeight,
         borderColor: echartsTheme.axisLineColor,
-        fillerColor: withAlpha(currentSignal.color, 0.12),
+        fillerColor: withAlpha(currentSignal.color, CHART_ALPHA.areaFillStart),
         handleStyle: {
           color: currentSignal.color,
         },
       },
     ],
     animation: !isLargeSeries,
-    animationDuration: isLargeSeries ? 0 : 300,
+    animationDuration: isLargeSeries
+      ? 0
+      : CHART_PERFORMANCE.animationDurationMs,
     media: [
       {
-        query: { maxWidth: 768 },
+        query: { maxWidth: CHART_BREAKPOINTS.mobile },
         option: {
           grid: {
-            left: "30px",
-            right: "30px",
+            left: CHART_LAYOUT.gridResponsivePadding,
+            right: CHART_LAYOUT.gridResponsivePadding,
           },
           title: {
-            textStyle: { fontSize: 14 },
+            textStyle: { fontSize: CHART_STYLE.responsiveTitleFontSize },
           },
         },
       },

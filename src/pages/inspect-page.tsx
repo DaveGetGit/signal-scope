@@ -8,6 +8,9 @@ import { AnnotationPopover } from "@/components/charts/annotation-popover";
 import { AnnotationSidebar } from "@/components/charts/annotation-sidebar";
 import { SignalSelector } from "@/components/charts/signal-selector";
 import { DateRangePicker } from "@/components/charts/date-range-picker";
+
+// Chart container dimensions
+const CHART_CONTAINER_HEIGHT_PX = 500;
 import { Button } from "@/components/ui/button";
 
 const InteractiveChart = lazy(() =>
@@ -20,7 +23,7 @@ function ChartFallback() {
   return (
     <div
       className="bg-white rounded-lg border border-slate-200 flex items-center justify-center"
-      style={{ height: 500 }}
+      style={{ height: CHART_CONTAINER_HEIGHT_PX }}
     >
       <div className="text-center">
         <div className="mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-slate-900" />
@@ -322,7 +325,9 @@ export function InspectPage() {
             </div>
 
             <div className="flex items-start space-x-2">
-              <span style={{ color: "var(--color-annotation-support)" }}>⚡</span>
+              <span style={{ color: "var(--color-annotation-support)" }}>
+                ⚡
+              </span>
               <div>
                 <p className="font-medium text-slate-900">Real-time</p>
                 <p className="text-slate-600">Live data from Binance API</p>

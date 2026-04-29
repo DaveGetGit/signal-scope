@@ -7,9 +7,12 @@ import { queryClient } from "@/hooks/use-query-client";
 import "./index.css";
 import App from "./App.tsx";
 
+// HTTP client configuration constants
+const API_TIMEOUT_MS = 15000; // 15 seconds
+
 HttpClient.initialize({
   baseURL: "https://api.binance.com",
-  timeout: 15000,
+  timeout: API_TIMEOUT_MS,
   defaultHeaders: {
     Accept: "application/json",
   },

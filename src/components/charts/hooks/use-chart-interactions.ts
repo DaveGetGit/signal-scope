@@ -1,13 +1,15 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  type RefObject,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, type RefObject } from "react";
 import type ReactEChartsCore from "echarts-for-react/esm/core";
 import type { DragSelectionEvent } from "@/types/annotations";
 import type { DateRange } from "@/components/charts/date-range-picker";
+
+// UI positioning constants
+const CHART_MARGIN_PX = 16; // Matches 1rem spacing used in popover CSS
+const POPOVER_VERTICAL_OFFSET_PX = -12; // Positions popover above selection
+const DATA_ZOOM_DEBOUNCE_MS = 250;
+
+// Time comparison threshold to prevent unnecessary updates (in milliseconds)
+const TIME_CHANGE_THRESHOLD_MS = 1_000;
 
 interface BrushEventParams {
   areas?: Array<{
@@ -111,8 +113,11 @@ export function useChartInteractions({
       const dragEvent: DragSelectionEvent = {
         selection,
         position: {
-          x: Math.min(Math.max(pixelX, 16), chartBounds.width - 16),
-          y: Math.max(pixelY - 12, 16),
+          x: Math.min(
+            Math.max(pixelX, CHART_MARGIN_PX),
+            chartBounds.width - CHART_MARGIN_PX,
+          ),
+          y: Math.max(pixelY + POPOVER_VERTICAL_OFFSET_PX, CHART_MARGIN_PX),
         },
       };
 
@@ -169,8 +174,8 @@ export function useChartInteractions({
     if (
       startTime !== undefined &&
       endTime !== undefined &&
-      Math.abs(nextRange.from - startTime) < 1_000 &&
-      Math.abs(nextRange.to - endTime) < 1_000
+      Math.abs(nextRange.from - startTime) < TIME_CHANGE_THRESHOLD_MS &&
+      Math.abs(nextRange.to - endTime) < TIME_CHANGE_THRESHOLD_MS
     ) {
       return;
     }
@@ -181,14 +186,8 @@ export function useChartInteractions({
 
     dataZoomTimeoutRef.current = setTimeout(() => {
       onVisibleRangeChange(nextRange);
-    }, 250);
-  }, [
-    chartRef,
-    endTime,
-    onVisibleRangeChange,
-    sampleBounds,
-    startTime,
-  ]);
+    }, DATA_ZOOM_DEBOUNCE_MS);
+  }, [chartRef, endTime, onVisibleRangeChange, sampleBounds, startTime]);
 
   const onEvents = useMemo(() => {
     if (!enableAnnotations) return {};

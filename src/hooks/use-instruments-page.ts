@@ -8,6 +8,11 @@ import {
   SortOrder,
 } from "@/features/instruments/api/types";
 
+// Default time range constants
+const DEFAULT_TIME_RANGE_DAYS = 30;
+const DAYS_TO_MILLISECONDS = 24 * 60 * 60 * 1000;
+const DEFAULT_TIME_RANGE_MS = DEFAULT_TIME_RANGE_DAYS * DAYS_TO_MILLISECONDS;
+
 const LAST_INSTRUMENTS_URL_KEY = "signal-scope:last-instruments-url";
 
 export function useInstrumentsPage() {
@@ -22,7 +27,9 @@ export function useInstrumentsPage() {
     source: urlState.search,
   });
   const searchInput =
-    searchDraft.source === urlState.search ? searchDraft.value : urlState.search;
+    searchDraft.source === urlState.search
+      ? searchDraft.value
+      : urlState.search;
 
   const debouncedSearch = useDebounce(searchInput, 250);
 
@@ -55,10 +62,7 @@ export function useInstrumentsPage() {
   );
 
   const handleSortChange = (sortBy: string) => {
-    updateSort(
-      sortBy as InstrumentSortField,
-      urlState.sortOrder,
-    );
+    updateSort(sortBy as InstrumentSortField, urlState.sortOrder);
   };
 
   const toggleSortOrder = () => {
@@ -74,7 +78,7 @@ export function useInstrumentsPage() {
       window.sessionStorage.setItem(LAST_INSTRUMENTS_URL_KEY, returnTo);
 
       navigate(
-        `/instruments/${symbol}?signal=close&from=${Date.now() - 30 * 24 * 60 * 60 * 1000}&to=${Date.now()}`,
+        `/instruments/${symbol}?signal=close&from=${Date.now() - DEFAULT_TIME_RANGE_MS}&to=${Date.now()}`,
         {
           state: {
             returnTo,
