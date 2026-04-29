@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import type { OnChangeFn, SortingState } from "@tanstack/react-table";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useGetInstruments } from "@/features/instruments/hooks/use-get-instruments";
@@ -79,12 +79,15 @@ export function useInstrumentsPage() {
     );
   };
 
-  const sorting: SortingState = [
-    {
-      id: urlState.sortBy,
-      desc: urlState.sortOrder === SortOrder.Desc,
-    },
-  ];
+  const sorting: SortingState = useMemo(
+    () => [
+      {
+        id: urlState.sortBy,
+        desc: urlState.sortOrder === SortOrder.Desc,
+      },
+    ],
+    [urlState.sortBy, urlState.sortOrder],
+  );
 
   const handleTableSortingChange: OnChangeFn<SortingState> = useCallback(
     (updaterOrValue) => {
