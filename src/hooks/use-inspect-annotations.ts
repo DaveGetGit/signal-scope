@@ -46,10 +46,17 @@ export function useInspectAnnotations({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.ctrlKey && event.key === "z" && !event.shiftKey) {
+      const isPrimaryModifier = event.ctrlKey || event.metaKey;
+      const normalizedKey = event.key.toLowerCase();
+
+      if (isPrimaryModifier && normalizedKey === "z" && !event.shiftKey) {
         event.preventDefault();
         undo();
-      } else if (event.ctrlKey && event.shiftKey && event.key === "Z") {
+      } else if (
+        isPrimaryModifier &&
+        event.shiftKey &&
+        normalizedKey === "z"
+      ) {
         event.preventDefault();
         redo();
       } else if (event.key === "Escape" && isAnnotating) {

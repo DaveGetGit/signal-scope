@@ -1,4 +1,5 @@
-set shell := ["powershell.exe", "-NoLogo", "-Command"]
+set shell := ["sh", "-cu"]
+set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 
 default:
     just --list
@@ -21,4 +22,3 @@ build:
 
 preview:
     docker compose --profile prod up app-prod
-

@@ -115,7 +115,7 @@ export function AnnotationSidebar({
           Keyboard shortcuts
         </p>
         <p className="mt-1 text-xs text-slate-500">
-          Ctrl+Z to undo, Ctrl+Shift+Z to redo
+          Ctrl/Cmd+Z to undo, Ctrl/Cmd+Shift+Z to redo
         </p>
       </div>
 
