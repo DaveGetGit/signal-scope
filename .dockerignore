@@ -1,0 +1,10 @@
+dist
+coverage
+node_modules
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+justfile
+README.md
+

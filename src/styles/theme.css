@@ -1,0 +1,174 @@
+:root {
+  /* Primary brand colors */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6; /* Main brand blue */
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+
+  /* Success/positive colors */
+  --color-success-50: #ecfdf5;
+  --color-success-100: #d1fae5;
+  --color-success-200: #a7f3d0;
+  --color-success-300: #6ee7b7;
+  --color-success-400: #34d399;
+  --color-success-500: #10b981; /* Main success green */
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+  --color-success-800: #065f46;
+  --color-success-900: #064e3b;
+
+  /* Danger/negative colors */
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-200: #fecaca;
+  --color-danger-300: #fca5a5;
+  --color-danger-400: #f87171;
+  --color-danger-500: #ef4444; /* Main danger red */
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+  --color-danger-800: #991b1b;
+  --color-danger-900: #7f1d1d;
+
+  /* Warning colors */
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-200: #fde68a;
+  --color-warning-300: #fcd34d;
+  --color-warning-400: #fbbf24;
+  --color-warning-500: #f59e0b; /* Main warning amber */
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+  --color-warning-800: #92400e;
+  --color-warning-900: #78350f;
+
+  /* Neutral/gray colors */
+  --color-neutral-50: #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #64748b; /* Main neutral */
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
+
+  /* Chart-specific colors */
+  --color-chart-bullish: #10b981; /* Green for positive movement */
+  --color-chart-bearish: #ef4444; /* Red for negative movement */
+  --color-chart-volume: #6366f1; /* Indigo for volume */
+  --color-chart-grid: #e2e8f0; /* Light gray for grid */
+  --color-chart-axis: #64748b; /* Medium gray for labels */
+  --color-chart-title: #334155; /* Dark gray for titles */
+  --color-chart-bg: #ffffff; /* White background */
+  --color-chart-tooltip: #f1f5f9; /* Light background for tooltips */
+
+  /* Annotation colors */
+  --color-annotation-rally: #10b981; /* Green */
+  --color-annotation-decline: #ef4444; /* Red */
+  --color-annotation-consolidation: #6366f1; /* Indigo */
+  --color-annotation-breakout: #f59e0b; /* Amber */
+  --color-annotation-support: #8b5cf6; /* Violet */
+  --color-annotation-resistance: #ec4899; /* Pink */
+
+  /* Semantic UI tokens */
+  --surface-page: var(--color-neutral-50);
+  --surface-card: #ffffff;
+  --surface-muted: var(--color-neutral-50);
+  --surface-subtle: var(--color-neutral-100);
+  --text-primary: var(--color-neutral-900);
+  --text-secondary: var(--color-neutral-700);
+  --text-muted: var(--color-neutral-500);
+  --text-inverse: #ffffff;
+  --border-subtle: var(--color-neutral-200);
+  --border-strong: var(--color-neutral-300);
+  --focus-ring: var(--color-neutral-900);
+  --status-warning-surface: var(--color-warning-50);
+  --status-warning-border: var(--color-warning-200);
+  --status-warning-text: var(--color-warning-800);
+  --status-info-surface: var(--color-primary-50);
+  --status-info-border: var(--color-primary-200);
+  --status-info-text: var(--color-primary-700);
+}
+
+/* Dark theme overrides (for future use) */
+[data-theme="dark"] {
+  --color-chart-bg: #0f172a;
+  --color-chart-tooltip: #1e293b;
+  --color-chart-grid: #334155;
+  --color-chart-axis: #94a3b8;
+  --color-chart-title: #f1f5f9;
+}
+
+/* High contrast theme (for accessibility) */
+[data-theme="high-contrast"] {
+  --color-primary-500: #0000ff;
+  --color-success-500: #00ff00;
+  --color-danger-500: #ff0000;
+  --color-neutral-500: #000000;
+}
+
+.chart-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1280px) {
+  .chart-layout {
+    grid-template-columns: minmax(0, 1fr) 22rem;
+  }
+}
+
+.chart-popover-shell {
+  max-width: calc(100% - 2rem);
+  transform: translate(-50%, calc(-100% - 0.75rem));
+}
+
+.signal-option-button {
+  min-width: 7.5rem;
+}
+
+.range-chip-custom {
+  min-width: 4.5rem;
+}
+
+.range-chip-preset {
+  min-width: 3.125rem;
+}
+
+.annotation-list {
+  max-height: 36rem;
+}
+
+.text-2xs {
+  font-size: 0.6875rem;
+  line-height: 1rem;
+}
+
+.field-error {
+  border-color: var(--color-danger-500);
+}
+
+.field-error:focus,
+.field-error:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-danger-500);
+}
+
+.text-positive {
+  color: var(--color-success-600);
+}
+
+.text-negative,
+.error-text {
+  color: var(--color-danger-600);
+}
+
+.text-muted-token {
+  color: var(--text-muted);
+}
