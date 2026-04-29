@@ -12,6 +12,7 @@ import { DateRangePicker } from "@/components/charts/date-range-picker";
 // Chart container dimensions
 const CHART_CONTAINER_HEIGHT_PX = 500;
 const CHART_ANNOTATION_REGION_ID = "chart-annotation-region";
+const DIRECT_DRAG_ANNOTATION_ENABLED = true;
 import { Button } from "@/components/ui/button";
 
 const InteractiveChart = lazy(() =>
@@ -243,9 +244,9 @@ export function InspectPage() {
                   className="text-xs"
                   style={{ color: "var(--status-info-text)" }}
                 >
-                  💡 Tip: Clicking "Add Annotations" moves focus to the chart.
-                  Your mouse cursor will show a crosshair when hovering. Press
-                  Escape or click the button again to exit.
+                  💡 Tip: You can drag directly on the chart to annotate, or
+                  click "Add Annotations" to jump there. Press Escape or click
+                  the button again to exit guided annotation mode.
                 </p>
               </div>
             )}
@@ -278,6 +279,7 @@ export function InspectPage() {
                 endTime={dateRange.to}
                 height={500}
                 enableAnnotations={true}
+                annotationSelectionEnabled={DIRECT_DRAG_ANNOTATION_ENABLED}
                 isAnnotating={isAnnotating}
                 annotations={annotations}
                 {...(perfProfile ? { perfProfile } : {})}

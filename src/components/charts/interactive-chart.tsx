@@ -51,6 +51,8 @@ export interface ChartProps {
   height?: number;
   /** Whether annotation mode is enabled */
   enableAnnotations?: boolean;
+  /** Whether drag-selection for annotations should be active */
+  annotationSelectionEnabled?: boolean;
   /** Whether currently in annotation mode */
   isAnnotating?: boolean;
   /** Array of annotations to display */
@@ -70,6 +72,7 @@ export function InteractiveChart({
   endTime,
   height = 400,
   enableAnnotations = false,
+  annotationSelectionEnabled = false,
   isAnnotating = false,
   annotations = [],
   perfProfile,
@@ -101,9 +104,9 @@ export function InteractiveChart({
 
     return buildInteractiveChartOptions({
       annotations,
+      annotationSelectionEnabled,
       currentSignal,
       enableAnnotations,
-      isAnnotating,
       isLargeSeries,
       maxRenderPoints: MAX_RENDER_POINTS,
       samplesData,
@@ -112,20 +115,20 @@ export function InteractiveChart({
     });
   }, [
     annotations,
+    annotationSelectionEnabled,
     currentSignal,
     enableAnnotations,
-    isAnnotating,
     isLargeSeries,
     samplesData,
     signal,
     symbol,
   ]);
 
-  const { onEvents } = useChartInteractions({
+  const { onEvents, onChartReady } = useChartInteractions({
+    annotationSelectionEnabled,
     chartRef,
     enableAnnotations,
     endTime,
-    isAnnotating,
     onDragSelection,
     onVisibleRangeChange,
     sampleBounds,
@@ -183,7 +186,7 @@ export function InteractiveChart({
   return (
     <div
       className={`bg-white rounded-lg border border-slate-200 p-4 ${
-        isAnnotating ? "cursor-crosshair" : ""
+        annotationSelectionEnabled || isAnnotating ? "cursor-crosshair" : ""
       }`}
     >
       <ReactEChartsCore
@@ -193,10 +196,14 @@ export function InteractiveChart({
         style={{
           height: `${height}px`,
           width: "100%",
-          cursor: isAnnotating ? "crosshair" : "default",
+          cursor:
+            annotationSelectionEnabled || isAnnotating
+              ? "crosshair"
+              : "default",
         }}
         opts={{ renderer: "canvas" }}
         onEvents={onEvents}
+        onChartReady={onChartReady}
         notMerge={true}
         lazyUpdate={true}
       />

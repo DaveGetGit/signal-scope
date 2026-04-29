@@ -42,9 +42,9 @@ const CHART_BREAKPOINTS = {
 
 interface BuildInteractiveChartOptionsArgs {
   annotations: ChartAnnotation[];
+  annotationSelectionEnabled: boolean;
   currentSignal: Signal;
   enableAnnotations: boolean;
-  isAnnotating: boolean;
   isLargeSeries: boolean;
   maxRenderPoints: number;
   samplesData: SamplesResponse;
@@ -54,9 +54,9 @@ interface BuildInteractiveChartOptionsArgs {
 
 export function buildInteractiveChartOptions({
   annotations,
+  annotationSelectionEnabled,
   currentSignal,
   enableAnnotations,
-  isAnnotating,
   isLargeSeries,
   maxRenderPoints,
   samplesData,
@@ -229,7 +229,7 @@ export function buildInteractiveChartOptions({
         },
       },
     ],
-    ...(enableAnnotations && isAnnotating
+    ...(enableAnnotations && annotationSelectionEnabled
       ? {
           brush: {
             toolbox: ["rect"],
@@ -251,7 +251,7 @@ export function buildInteractiveChartOptions({
         }
       : {}),
     dataZoom: [
-      ...(isAnnotating
+      ...(annotationSelectionEnabled
         ? []
         : [
             {
@@ -260,6 +260,18 @@ export function buildInteractiveChartOptions({
               filterMode: "none",
             },
           ]),
+      ...(annotationSelectionEnabled
+        ? [
+            {
+              type: "inside",
+              xAxisIndex: 0,
+              filterMode: "none",
+              zoomOnMouseWheel: true,
+              moveOnMouseMove: false,
+              moveOnMouseWheel: false,
+            },
+          ]
+        : []),
       {
         type: "slider",
         xAxisIndex: 0,

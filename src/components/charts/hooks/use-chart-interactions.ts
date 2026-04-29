@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, type RefObject } from "react";
 import type ReactEChartsCore from "echarts-for-react/esm/core";
+import type { EChartsInstance } from "echarts-for-react/esm/types";
 import type { DragSelectionEvent } from "@/types/annotations";
 import type { DateRange } from "@/components/charts/date-range-picker";
 
@@ -30,10 +31,10 @@ interface ChartOptionSnapshot {
 }
 
 interface UseChartInteractionsArgs {
+  annotationSelectionEnabled: boolean;
   chartRef: RefObject<ReactEChartsCore | null>;
   enableAnnotations: boolean;
   endTime: number | undefined;
-  isAnnotating: boolean;
   onDragSelection: ((event: DragSelectionEvent) => void) | undefined;
   onVisibleRangeChange: ((range: DateRange) => void) | undefined;
   sampleBounds: { start: number; end: number } | null;
@@ -41,10 +42,10 @@ interface UseChartInteractionsArgs {
 }
 
 export function useChartInteractions({
+  annotationSelectionEnabled,
   chartRef,
   enableAnnotations,
   endTime,
-  isAnnotating,
   onDragSelection,
   onVisibleRangeChange,
   sampleBounds,
@@ -52,26 +53,51 @@ export function useChartInteractions({
 }: UseChartInteractionsArgs) {
   const dataZoomTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const syncBrushMode = useCallback(
+    (chartInstance: EChartsInstance | undefined | null) => {
+      if (!chartInstance || !enableAnnotations) {
+        return;
+      }
+
+      if (annotationSelectionEnabled) {
+        chartInstance.dispatchAction({
+          type: "takeGlobalCursor",
+          key: "brush",
+          brushOption: {
+            brushType: "rect",
+            brushMode: "single",
+          },
+        });
+      } else {
+        chartInstance.dispatchAction({
+          type: "brush",
+          areas: [],
+        });
+      }
+    },
+    [annotationSelectionEnabled, enableAnnotations],
+  );
+
   useEffect(() => {
     const chartInstance = chartRef.current?.getEchartsInstance();
     if (!chartInstance || !enableAnnotations) return;
 
-    if (isAnnotating) {
-      chartInstance.dispatchAction({
-        type: "takeGlobalCursor",
-        key: "brush",
-        brushOption: {
-          brushType: "rect",
-          brushMode: "single",
-        },
-      });
-    } else {
-      chartInstance.dispatchAction({
-        type: "brush",
-        areas: [],
-      });
-    }
-  }, [chartRef, enableAnnotations, isAnnotating]);
+    let frameId = 0;
+
+    frameId = window.requestAnimationFrame(() => {
+      syncBrushMode(chartInstance);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [
+    annotationSelectionEnabled,
+    chartRef,
+    enableAnnotations,
+    sampleBounds,
+    syncBrushMode,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -83,7 +109,9 @@ export function useChartInteractions({
 
   const handleBrushEnd = useCallback(
     (params: BrushEventParams) => {
-      if (!enableAnnotations || !isAnnotating || !onDragSelection) return;
+      if (!annotationSelectionEnabled || !enableAnnotations || !onDragSelection) {
+        return;
+      }
 
       const brushComponent = params.areas?.[0];
       if (!brushComponent) return;
@@ -135,8 +163,18 @@ export function useChartInteractions({
         type: "brush",
         areas: [],
       });
+
+      window.requestAnimationFrame(() => {
+        syncBrushMode(chartInstance);
+      });
     },
-    [chartRef, enableAnnotations, isAnnotating, onDragSelection],
+    [
+      annotationSelectionEnabled,
+      chartRef,
+      enableAnnotations,
+      onDragSelection,
+      syncBrushMode,
+    ],
   );
 
   const handleDataZoom = useCallback(() => {
@@ -198,14 +236,35 @@ export function useChartInteractions({
     }, DATA_ZOOM_DEBOUNCE_MS);
   }, [chartRef, endTime, onVisibleRangeChange, sampleBounds, startTime]);
 
+  const handleChartFinished = useCallback(() => {
+    const chartInstance = chartRef.current?.getEchartsInstance();
+    if (!chartInstance) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      syncBrushMode(chartInstance);
+    });
+  }, [chartRef, syncBrushMode]);
+
   const onEvents = useMemo(() => {
     if (!enableAnnotations) return {};
 
     return {
       brushEnd: handleBrushEnd,
       dataZoom: handleDataZoom,
+      finished: handleChartFinished,
     };
-  }, [enableAnnotations, handleBrushEnd, handleDataZoom]);
+  }, [enableAnnotations, handleBrushEnd, handleChartFinished, handleDataZoom]);
 
-  return { onEvents };
+  const handleChartReady = useCallback(
+    (chartInstance: EChartsInstance) => {
+      window.requestAnimationFrame(() => {
+        syncBrushMode(chartInstance);
+      });
+    },
+    [syncBrushMode],
+  );
+
+  return { onEvents, onChartReady: handleChartReady };
 }
