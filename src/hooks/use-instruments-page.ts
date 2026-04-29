@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import type { OnChangeFn, SortingState } from "@tanstack/react-table";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useGetInstruments } from "@/features/instruments/hooks/use-get-instruments";
 import { useUrlState } from "@/hooks/use-url-state";
@@ -14,6 +15,12 @@ const DAYS_TO_MILLISECONDS = 24 * 60 * 60 * 1000;
 const DEFAULT_TIME_RANGE_MS = DEFAULT_TIME_RANGE_DAYS * DAYS_TO_MILLISECONDS;
 
 const LAST_INSTRUMENTS_URL_KEY = "signal-scope:last-instruments-url";
+const TABLE_SORTABLE_FIELDS = new Set<InstrumentSortField>([
+  InstrumentSortField.Symbol,
+  InstrumentSortField.LastPrice,
+  InstrumentSortField.PriceChangePercent24h,
+  InstrumentSortField.Volume24h,
+]);
 
 export function useInstrumentsPage() {
   const navigate = useNavigate();
@@ -72,6 +79,34 @@ export function useInstrumentsPage() {
     );
   };
 
+  const sorting: SortingState = [
+    {
+      id: urlState.sortBy,
+      desc: urlState.sortOrder === SortOrder.Desc,
+    },
+  ];
+
+  const handleTableSortingChange: OnChangeFn<SortingState> = useCallback(
+    (updaterOrValue) => {
+      const nextSorting =
+        typeof updaterOrValue === "function"
+          ? updaterOrValue(sorting)
+          : updaterOrValue;
+
+      const nextSort = nextSorting[0];
+
+      if (!nextSort || !TABLE_SORTABLE_FIELDS.has(nextSort.id as InstrumentSortField)) {
+        return;
+      }
+
+      updateSort(
+        nextSort.id as InstrumentSortField,
+        nextSort.desc ? SortOrder.Desc : SortOrder.Asc,
+      );
+    },
+    [sorting, updateSort],
+  );
+
   const handleInspect = useCallback(
     (symbol: string) => {
       const returnTo = `${location.pathname}${location.search}`;
@@ -98,9 +133,11 @@ export function useInstrumentsPage() {
     isLoading,
     error,
     handleSortChange,
+    handleTableSortingChange,
     toggleSortOrder,
     handleInspect,
     goToPage,
     resetUrlState,
+    sorting,
   };
 }

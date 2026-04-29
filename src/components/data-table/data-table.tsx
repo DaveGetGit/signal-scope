@@ -29,12 +29,27 @@ export function DataTable<TData, TValue>({
   emptyMessage = "No data available",
   className,
 }: DataTableProps<TData, TValue>) {
+  const getAriaSort = (
+    isSorted: false | "asc" | "desc",
+  ): "none" | "ascending" | "descending" => {
+    if (isSorted === "asc") {
+      return "ascending";
+    }
+
+    if (isSorted === "desc") {
+      return "descending";
+    }
+
+    return "none";
+  };
+
   // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     manualSorting: true,
+    enableSortingRemoval: false,
     ...(sorting && {
       state: { sorting },
       onSortingChange,
@@ -80,32 +95,39 @@ export function DataTable<TData, TValue>({
                   <th
                     key={header.id}
                     scope="col"
+                    aria-sort={getAriaSort(header.column.getIsSorted())}
                     className="px-4 py-3 text-left text-sm font-medium text-slate-900"
                   >
                     {header.isPlaceholder ? null : (
-                      <div
-                        className={cn(
-                          "flex items-center space-x-2",
-                          header.column.getCanSort() &&
-                            "cursor-pointer select-none hover:bg-slate-100 -mx-2 px-2 py-1 rounded",
-                        )}
-                        onClick={header.column.getToggleSortingHandler()}
-                      >
-                        <span>
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                        </span>
-                        {header.column.getCanSort() && (
-                          <span className="text-slate-400">
+                      header.column.getCanSort() ? (
+                        <button
+                          type="button"
+                          className="flex items-center space-x-2 -mx-2 rounded px-2 py-1 text-left transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2"
+                          onClick={header.column.getToggleSortingHandler()}
+                        >
+                          <span>
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                          </span>
+                          <span className="text-slate-400" aria-hidden="true">
                             {{
                               asc: "↑",
                               desc: "↓",
                             }[header.column.getIsSorted() as string] ?? "↕"}
                           </span>
-                        )}
-                      </div>
+                        </button>
+                      ) : (
+                        <div className="flex items-center space-x-2">
+                          <span>
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                          </span>
+                        </div>
+                      )
                     )}
                   </th>
                 ))}

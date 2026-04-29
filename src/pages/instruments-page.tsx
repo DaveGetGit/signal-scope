@@ -31,10 +31,12 @@ export function InstrumentsPage() {
     isLoading,
     error,
     handleSortChange,
+    handleTableSortingChange,
     toggleSortOrder,
     handleInspect,
     goToPage,
     resetUrlState,
+    sorting,
   } = useInstrumentsPage();
 
   const columns: ColumnDef<Instrument>[] = useMemo(
@@ -81,6 +83,7 @@ export function InstrumentsPage() {
       {
         accessorKey: "high24h",
         header: "High",
+        enableSorting: false,
         cell: ({ getValue }) => (
           <span className="font-mono text-slate-600">
             {formatCurrency(getValue() as number)}
@@ -90,6 +93,7 @@ export function InstrumentsPage() {
       {
         accessorKey: "low24h",
         header: "Low",
+        enableSorting: false,
         cell: ({ getValue }) => (
           <span className="font-mono text-slate-600">
             {formatCurrency(getValue() as number)}
@@ -99,6 +103,7 @@ export function InstrumentsPage() {
       {
         id: "actions",
         header: "Actions",
+        enableSorting: false,
         cell: ({ row }) => (
           <div className="flex gap-2">
             <Button
@@ -190,6 +195,8 @@ export function InstrumentsPage() {
           <DataTable
             columns={columns}
             data={data?.instruments || []}
+            sorting={sorting}
+            onSortingChange={handleTableSortingChange}
             isLoading={isLoading}
             error={error?.message || null}
             emptyMessage="No instruments found. Try adjusting your search."
