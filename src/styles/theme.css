@@ -95,6 +95,18 @@
   --status-info-surface: var(--color-primary-50);
   --status-info-border: var(--color-primary-200);
   --status-info-text: var(--color-primary-700);
+  --button-primary-bg: var(--text-primary);
+  --button-primary-bg-hover: var(--color-neutral-800);
+  --button-primary-text: var(--text-inverse);
+  --button-secondary-bg: var(--surface-subtle);
+  --button-secondary-bg-hover: var(--color-neutral-200);
+  --button-secondary-text: var(--text-primary);
+  --button-outline-bg: var(--surface-card);
+  --button-outline-bg-hover: var(--surface-subtle);
+  --button-outline-border: var(--border-subtle);
+  --button-outline-text: var(--text-primary);
+  --button-ghost-bg-hover: var(--surface-subtle);
+  --button-ghost-text: var(--text-primary);
 }
 
 /* Dark theme overrides (for future use) */
@@ -171,4 +183,89 @@
 
 .text-muted-token {
   color: var(--text-muted);
+}
+
+.btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.btn-base:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--focus-ring),
+    0 0 0 4px var(--surface-card);
+}
+
+.btn-base:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.btn-primary {
+  background-color: var(--button-primary-bg);
+  color: var(--button-primary-text);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--button-primary-bg-hover);
+}
+
+.btn-secondary {
+  background-color: var(--button-secondary-bg);
+  color: var(--button-secondary-text);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--button-secondary-bg-hover);
+}
+
+.btn-outline {
+  background-color: var(--button-outline-bg);
+  border-color: var(--button-outline-border);
+  color: var(--button-outline-text);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: var(--button-outline-bg-hover);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--button-ghost-text);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--button-ghost-bg-hover);
+}
+
+.btn-size-sm {
+  height: 2.25rem;
+  padding-inline: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.btn-size-md {
+  height: 2.5rem;
+  padding-inline: 1rem;
+  padding-block: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.btn-size-lg {
+  height: 2.75rem;
+  padding-inline: 2rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
 }
