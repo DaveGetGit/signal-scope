@@ -36,6 +36,7 @@ interface AnnotationPopoverProps {
     x: number;
     y: number;
   };
+  placement?: "above" | "below";
   selection: {
     start: AnnotationCoordinate;
     end: AnnotationCoordinate;
@@ -47,6 +48,7 @@ interface AnnotationPopoverProps {
 export function AnnotationPopover({
   isVisible,
   position,
+  placement = "above",
   selection,
   onConfirm,
   onCancel,
@@ -123,7 +125,7 @@ export function AnnotationPopover({
       role="dialog"
       aria-modal="false"
       aria-labelledby="annotation-popover-title"
-      className="chart-popover-shell absolute z-20 w-80 rounded-lg border border-slate-200 bg-white p-4 shadow-xl"
+      className={`chart-popover-shell chart-popover-${placement} absolute z-20 w-80 rounded-lg border border-slate-200 bg-white p-4 shadow-xl`}
       style={{
         left: `clamp(1rem, ${position.x}px, calc(100% - 1rem))`,
         top: `max(1rem, ${position.y}px)`,

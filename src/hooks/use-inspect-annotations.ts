@@ -19,12 +19,14 @@ interface UseInspectAnnotationsArgs {
 interface PopoverState {
   isVisible: boolean;
   position: { x: number; y: number };
+  placement: "above" | "below";
   selection: DragSelectionEvent["selection"] | null;
 }
 
 const EMPTY_POPOVER_STATE: PopoverState = {
   isVisible: false,
   position: { x: 0, y: 0 },
+  placement: "above",
   selection: null,
 };
 
@@ -73,6 +75,7 @@ export function useInspectAnnotations({
     setPopoverState({
       isVisible: true,
       position: event.position,
+      placement: event.placement ?? "above",
       selection: event.selection,
     });
   }, []);

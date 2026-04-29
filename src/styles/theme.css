@@ -139,7 +139,16 @@
 
 .chart-popover-shell {
   max-width: calc(100% - 2rem);
+  max-height: min(24rem, calc(100vh - 4rem));
+  overflow-y: auto;
+}
+
+.chart-popover-above {
   transform: translate(-50%, calc(-100% - 0.75rem));
+}
+
+.chart-popover-below {
+  transform: translate(-50%, 0.75rem);
 }
 
 .signal-option-button {

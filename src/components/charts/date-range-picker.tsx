@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/purity */
 import { Button } from "@/components/ui/button";
 
 export interface DateRange {
@@ -16,10 +15,51 @@ export interface DateRangePreset {
   /** Description of the time period */
   description: string;
   /** Function to calculate date range */
-  getRange: () => DateRange;
+  durationMs: number;
 }
 
 const CUSTOM_RANGE_PRESET_ID = "custom";
+const MINUTE_MS = 60 * 1000;
+const HOUR_MS = 60 * MINUTE_MS;
+const DAY_MS = 24 * HOUR_MS;
+const YEAR_MS = 365 * DAY_MS;
+const PRESET_MATCH_TOLERANCE_MS = MINUTE_MS;
+
+const DATE_RANGE_PRESETS: readonly DateRangePreset[] = [
+  {
+    id: "24h",
+    label: "24H",
+    description: "Last 24 hours",
+    durationMs: DAY_MS,
+  },
+  {
+    id: "7d",
+    label: "7D",
+    description: "Last 7 days",
+    durationMs: 7 * DAY_MS,
+  },
+  {
+    id: "30d",
+    label: "30D",
+    description: "Last 30 days",
+    durationMs: 30 * DAY_MS,
+  },
+  {
+    id: "1y",
+    label: "1Y",
+    description: "Last 1 year",
+    durationMs: YEAR_MS,
+  },
+] as const;
+
+function buildRangeFromDuration(durationMs: number): DateRange {
+  const now = Date.now();
+
+  return {
+    from: now - durationMs,
+    to: now,
+  };
+}
 
 export interface DateRangePickerProps {
   selectedRange: DateRange;
@@ -32,66 +72,13 @@ export function DateRangePicker({
   onRangeChange,
   className = "",
 }: DateRangePickerProps) {
-  const presets: DateRangePreset[] = [
-    {
-      id: "24h",
-      label: "24H",
-      description: "Last 24 hours",
-      getRange: () => {
-        const now = Date.now();
-        return {
-          from: now - 24 * 60 * 60 * 1000,
-          to: now,
-        };
-      },
-    },
-    {
-      id: "7d",
-      label: "7D",
-      description: "Last 7 days",
-      getRange: () => {
-        const now = Date.now();
-        return {
-          from: now - 7 * 24 * 60 * 60 * 1000,
-          to: now,
-        };
-      },
-    },
-    {
-      id: "30d",
-      label: "30D",
-      description: "Last 30 days",
-      getRange: () => {
-        const now = Date.now();
-        return {
-          from: now - 30 * 24 * 60 * 60 * 1000,
-          to: now,
-        };
-      },
-    },
-    {
-      id: "1y",
-      label: "1Y",
-      description: "Last 1 year",
-      getRange: () => {
-        const now = Date.now();
-        return {
-          from: now - 365 * 24 * 60 * 60 * 1000,
-          to: now,
-        };
-      },
-    },
-  ] as const;
-
   const getSelectedPreset = (): string | null => {
-    const tolerance = 60 * 1000;
+    const selectedDuration = selectedRange.to - selectedRange.from;
 
-    for (const preset of presets) {
-      const range = preset.getRange();
-
+    for (const preset of DATE_RANGE_PRESETS) {
       if (
-        Math.abs(selectedRange.from - range.from) < tolerance &&
-        Math.abs(selectedRange.to - range.to) < tolerance
+        Math.abs(selectedDuration - preset.durationMs) <
+        PRESET_MATCH_TOLERANCE_MS
       ) {
         return preset.id;
       }
@@ -125,7 +112,7 @@ export function DateRangePicker({
         >
           Custom
         </Button>
-        {presets.map((preset) => {
+        {DATE_RANGE_PRESETS.map((preset) => {
           const isSelected = activePresetId === preset.id;
 
           return (
@@ -133,7 +120,7 @@ export function DateRangePicker({
               key={preset.id}
               variant={isSelected ? "primary" : "outline"}
               size="sm"
-              onClick={() => onRangeChange(preset.getRange())}
+              onClick={() => onRangeChange(buildRangeFromDuration(preset.durationMs))}
               className="range-chip-preset shadow-sm"
               title={preset.description}
             >
@@ -150,7 +137,7 @@ export function DateRangePicker({
 
       {selectedPresetId ? (
         <p className="text-sm text-slate-600">
-          {presets.find((p) => p.id === selectedPresetId)?.description}
+          {DATE_RANGE_PRESETS.find((preset) => preset.id === selectedPresetId)?.description}
         </p>
       ) : (
         <div className="space-y-1">

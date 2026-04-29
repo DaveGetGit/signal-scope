@@ -40,6 +40,7 @@ export interface AnnotationState {
 export interface DragSelectionEvent {
   selection: AnnotationSelection;
   position: { x: number; y: number };
+  placement?: "above" | "below";
 }
 
 export interface AnnotationCreateRequest {

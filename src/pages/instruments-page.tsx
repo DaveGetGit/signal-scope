@@ -203,7 +203,7 @@ export function InstrumentsPage() {
           />
         </div>
 
-        {data && data.totalPages > 1 && (
+        {data && (
           <div className="flex items-center justify-between">
             <p className="text-sm text-slate-700">
               Page {data.page} of {data.totalPages} ({data.total} total
@@ -214,7 +214,7 @@ export function InstrumentsPage() {
               <Button
                 variant="outline"
                 onClick={() => goToPage(urlState.page - 1)}
-                disabled={urlState.page <= 1}
+                disabled={urlState.page <= 1 || data.totalPages <= 1}
               >
                 Previous
               </Button>
@@ -222,7 +222,7 @@ export function InstrumentsPage() {
               <Button
                 variant="outline"
                 onClick={() => goToPage(urlState.page + 1)}
-                disabled={urlState.page >= data.totalPages}
+                disabled={urlState.page >= data.totalPages || data.totalPages <= 1}
               >
                 Next
               </Button>

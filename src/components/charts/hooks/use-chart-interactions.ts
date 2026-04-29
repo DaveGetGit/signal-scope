@@ -6,6 +6,7 @@ import type { DateRange } from "@/components/charts/date-range-picker";
 // UI positioning constants
 const CHART_MARGIN_PX = 16; // Matches 1rem spacing used in popover CSS
 const POPOVER_VERTICAL_OFFSET_PX = -12; // Positions popover above selection
+const POPOVER_VISIBLE_HEIGHT_ESTIMATE_PX = 240;
 const DATA_ZOOM_DEBOUNCE_MS = 250;
 
 // Time comparison threshold to prevent unnecessary updates (in milliseconds)
@@ -110,6 +111,8 @@ export function useChartInteractions({
       ) as [number, number];
 
       const chartBounds = chartInstance.getDom().getBoundingClientRect();
+      const hasRoomAbove =
+        pixelY - POPOVER_VISIBLE_HEIGHT_ESTIMATE_PX > CHART_MARGIN_PX;
       const dragEvent: DragSelectionEvent = {
         selection,
         position: {
@@ -117,8 +120,14 @@ export function useChartInteractions({
             Math.max(pixelX, CHART_MARGIN_PX),
             chartBounds.width - CHART_MARGIN_PX,
           ),
-          y: Math.max(pixelY + POPOVER_VERTICAL_OFFSET_PX, CHART_MARGIN_PX),
+          y: hasRoomAbove
+            ? Math.max(pixelY + POPOVER_VERTICAL_OFFSET_PX, CHART_MARGIN_PX)
+            : Math.min(
+                pixelY + Math.abs(POPOVER_VERTICAL_OFFSET_PX),
+                chartBounds.height - CHART_MARGIN_PX,
+              ),
         },
+        placement: hasRoomAbove ? "above" : "below",
       };
 
       onDragSelection(dragEvent);

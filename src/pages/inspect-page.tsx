@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useInspectPage } from "@/hooks/use-inspect-page";
 import { useInspectAnnotations } from "@/hooks/use-inspect-annotations";
@@ -11,6 +11,7 @@ import { DateRangePicker } from "@/components/charts/date-range-picker";
 
 // Chart container dimensions
 const CHART_CONTAINER_HEIGHT_PX = 500;
+const CHART_ANNOTATION_REGION_ID = "chart-annotation-region";
 import { Button } from "@/components/ui/button";
 
 const InteractiveChart = lazy(() =>
@@ -34,6 +35,7 @@ function ChartFallback() {
 }
 
 export function InspectPage() {
+  const chartAnnotationRegionRef = useRef<HTMLDivElement>(null);
   const {
     symbol,
     isValidSymbol,
@@ -78,6 +80,25 @@ export function InspectPage() {
   const handleVisibleRangeChange = (range: { from: number; to: number }) => {
     updateDateRange(range);
   };
+
+  useEffect(() => {
+    if (!isAnnotating) {
+      return;
+    }
+
+    const region = chartAnnotationRegionRef.current;
+    if (!region) {
+      return;
+    }
+
+    window.requestAnimationFrame(() => {
+      region.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+      region.focus({ preventScroll: true });
+    });
+  }, [isAnnotating]);
 
   if (!isValidSymbol) {
     return (
@@ -222,9 +243,9 @@ export function InspectPage() {
                   className="text-xs"
                   style={{ color: "var(--status-info-text)" }}
                 >
-                  💡 Tip: Your mouse cursor will show a crosshair when hovering
-                  over the chart. Press Escape or click "Add Annotations" to
-                  exit.
+                  💡 Tip: Clicking "Add Annotations" moves focus to the chart.
+                  Your mouse cursor will show a crosshair when hovering. Press
+                  Escape or click the button again to exit.
                 </p>
               </div>
             )}
@@ -233,6 +254,10 @@ export function InspectPage() {
 
         <div className="chart-layout mb-6 gap-6 items-start">
           <div
+            id={CHART_ANNOTATION_REGION_ID}
+            ref={chartAnnotationRegionRef}
+            tabIndex={-1}
+            aria-label="Interactive chart annotation area"
             className={`relative transition-all duration-200 ${
               isAnnotating ? "rounded-lg shadow-lg ring-2" : ""
             }`}
@@ -280,6 +305,7 @@ export function InspectPage() {
             <AnnotationPopover
               isVisible={popoverState.isVisible}
               position={popoverState.position}
+              placement={popoverState.placement}
               selection={
                 popoverState.selection ?? {
                   start: { x: 0, y: 0 },
